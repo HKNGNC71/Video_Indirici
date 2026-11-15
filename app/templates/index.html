@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Indirici - YouTube &amp; Instagram Downloader</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true">
+    <span class="glow glow-a"></span>
+    <span class="glow glow-b"></span>
+    <span class="glow glow-c"></span>
+  </div>
+
+  <main class="shell">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"></path>
+            <path d="m7 10 5 5 5-5"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>Video Indirici</h1>
+          <p>Download videos and audio from YouTube &amp; Instagram</p>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge">yt-dlp</span>
+        <span class="badge">ffmpeg</span>
+        <span class="badge" id="status-badge">starting...</span>
+      </div>
+    </header>
+
+    <section class="card composer">
+      <div class="card-head">
+        <h2>Paste links</h2>
+        <button class="link-btn" id="paste-btn" type="button">Paste from clipboard</button>
+      </div>
+
+      <textarea id="urls" spellcheck="false"
+        placeholder="https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/..."></textarea>
+
+      <div class="hint-row">
+        <span class="hint">One link per line. Up to 25 links per batch.</span>
+      </div>
+
+      <div class="format-block">
+        <div class="segmented" role="tablist" aria-label="Format type">
+          <button class="seg is-active" type="button" data-mode="video" role="tab" aria-selected="true">Video</button>
+          <button class="seg" type="button" data-mode="audio" role="tab" aria-selected="false">Audio only</button>
+        </div>
+
+        <div class="chips" id="video-chips" role="radiogroup" aria-label="Video quality">
+          <button class="chip is-active" type="button" data-quality="best">Best available</button>
+          <button class="chip" type="button" data-quality="1080">1080p</button>
+          <button class="chip" type="button" data-quality="720">720p</button>
+          <button class="chip" type="button" data-quality="480">480p</button>
+          <button class="chip" type="button" data-quality="360">360p</button>
+        </div>
+
+        <div class="chips is-hidden" id="audio-chips" role="radiogroup" aria-label="Audio format">
+          <button class="chip" type="button" data-quality="m4a">M4A</button>
+          <button class="chip" type="button" data-quality="mp3">MP3 192 kbps</button>
+        </div>
+      </div>
+
+      <div class="options">
+        <label class="check">
+          <input type="checkbox" id="playlist">
+          <span>Download entire playlist / carousel</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="use-cookies" checked>
+          <span>Use cookies.txt when available</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="download-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <path d="M7 10l5 5 5-5"></path>
+            <path d="M12 15V3"></path>
+          </svg>
+          Download
+        </button>
+        <button class="btn ghost" id="open-folder" type="button">Open downloads folder</button>
+        <span class="hint" id="dl-hint"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Downloads</h2>
+        <button class="link-btn" id="clear-jobs" type="button">Clear finished</button>
+      </div>
+      <div id="jobs" class="job-list">
+        <div class="empty">No downloads yet. Paste a link above to get started.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Cookies for private content</h2>
+        <span class="pill" id="cookie-state">Not uploaded</span>
+      </div>
+      <p class="muted">
+        Private, age-restricted, or login-only YouTube and Instagram content needs a logged-in session.
+        Export cookies from your browser and upload them here.
+      </p>
+      <div class="actions">
+        <input type="file" id="cookie-file" accept=".txt,text/plain" hidden>
+        <button class="btn ghost" id="cookie-upload" type="button">Upload cookies.txt</button>
+        <button class="btn ghost danger" id="cookie-remove" type="button">Remove cookies</button>
+      </div>
+      <details class="details">
+        <summary>How to get a cookies.txt file</summary>
+        <ol>
+          <li>Install a <strong>Get cookies.txt LOCALLY</strong> extension for Chrome, Edge, or Firefox.</li>
+          <li>Log in to YouTube or Instagram in that browser.</li>
+          <li>Open the site, export its cookies with the extension, and save the file as <code>cookies.txt</code>.</li>
+          <li>Upload the file above. Replace it any time the downloads start failing.</li>
+        </ol>
+        <p class="hint small">Cookies stay on your machine in this app's <code>data</code> folder and are only sent to the site you are downloading from.</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Library</h2>
+        <span class="pill" id="lib-count">0 files</span>
+      </div>
+      <div id="library" class="lib-grid">
+        <div class="empty">Downloaded files will appear here.</div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Files are saved in this app's <code>downloads</code> folder.</span>
+      <span>Only download content you own or have permission to save.</span>
+    </footer>
+  </main>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
